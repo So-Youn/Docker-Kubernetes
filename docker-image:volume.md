@@ -137,3 +137,90 @@ mysql:5.7
 # /home/wordpress_db == /var/lib/mysql
 ```
 
+```shell
+$ docker run -i -t \
+--name volume_overide \
+-v /home/wordpress_db:/home/testdir_2 \
+alicek106/volume_test
+```
+
+* `--volumes-from` : `-v` or `--volume` 을 적용한 컨테이너의 볼륨 디렉토리 공유 가능 ( `-v`  옵션을 적용한 컨테이너를 통해 공유)
+
+  > Ex) 위에서 생성한 volume_overide컨테이너는 /home/testdir_2 디렉터리를 호스트와 공유하고 있다. 
+  >
+  > 이 컨테이너를 볼륨 컨테이너로서 volumes_from_container 컨테이너에 다시 공유하는 것임
+
+```shell
+$ docker run -i -t \
+--name volumes_from_container \
+-- volumes-from volume_overide  \
+ubuntu:14.04
+
+$ ls /home/testdir_2/
+```
+
+* `docker volume` 명령어
+
+```shell
+# 볼륨 생성
+$ docker volume create --name myvolume
+
+# 생성된 볼륨 확인
+$ docker volume ls
+```
+
+```shell
+$ docker run -i -t --name myvolume_1 \
+-v myvolume:/root/ \
+ubuntu:14.04
+
+$ echo hello,volume! >> /root/volume # root 디렉터리에 volume 파일 생성
+```
+
+```shell
+$ docker run -i -t --name myvolume_2 \
+-v myvolume:/root/ \
+ubuntu:14.04
+# 확인해보면 volume 파일 존재함
+$ cat /root/volume
+```
+
+* 호스트에 저장함으로써 데이터를 보존하지만 파일이 실제로 어디에 저장되는 지 사용자는 알 필요 없음.
+* `docker inspect` 명령어를 사용해 볼륨이 실제 어디에 저장되는 지 알 수 있음
+  * 컨테이너, 이미지, 볼륨 등 도커의 모든 구성 단위의 정보를 확인할 때 사용한다.
+  * 정보를 확인할 종류를 명시하기 위해 `--type` 옵션에 image, volume등을 입력하는 것이 좋다.
+
+```shell
+$ docker inspect --type volume myvolume
+
+# 특정 구성 단위를 제어하는 명령어 사용...
+$ docker container inspect
+$ docker volume inspect
+```
+
+* `Mountpoint` : 해당 볼륨이 실제로 호스트의 어디에 저장됐는 지를 의미한다.
+
+* 해당 디렉터리의 파일 살펴보면 컨테이너에서 사용했던 파일이 남아있음을 알 수 있다.
+
+  ```shell
+  $ ls /var/lib/docker/volumes/myvolume/_data
+  
+  $ ls /var/lib/docker/volumes/myvolume/_data/volume
+  ```
+
+* `docker volume create` 명령어를 사용하지 않아도 `-v` 옵션 입력할 때 이를 수행하도록 설정할 수 있다.
+
+```shell
+$ docker run -i -t --name volume_auto \
+-v /root \
+ubuntu:14.04
+
+$ docker volume ls
+$ docker container inspect volume_auto
+# Source 항목에 정의된 디렉터리인 /var/lib/ ... 이 volume_auto 컨테이너에 마운트돼 볼륨으로 쓰고 있다.
+```
+
+* 사용되지 않은 볼륨을 한꺼번에 삭제하려면 `docker volume prune` 명령어를 사용한다.
+
+
+
