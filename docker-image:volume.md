@@ -153,10 +153,14 @@ alicek106/volume_test
 ```shell
 $ docker run -i -t \
 --name volumes_from_container \
--- volumes-from volume_overide  \
+--volumes-from volume_overide  \
 ubuntu:14.04
 
-$ ls /home/testdir_2/
+root@282a7a1c20ed:/# ls /home/testdir_2/
+auto.cnf         client-key.pem  ibdata1             private_key.pem  sys
+ca-key.pem       ib_buffer_pool  ibtmp1              public_key.pem   wordpress
+ca.pem           ib_logfile0     mysql               server-cert.pem
+client-cert.pem  ib_logfile1     performance_schema  server-key.pem
 ```
 
 * `docker volume` 명령어
@@ -164,9 +168,13 @@ $ ls /home/testdir_2/
 ```shell
 # 볼륨 생성
 $ docker volume create --name myvolume
+myvolume
 
 # 생성된 볼륨 확인
 $ docker volume ls
+DRIVER    VOLUME NAME
+local     c84c33b757bd0999555d1f1bd39df480032db5f9ed548f5609083f2e592d7ecd
+local     myvolume
 ```
 
 ```shell
@@ -181,8 +189,10 @@ $ echo hello,volume! >> /root/volume # root 디렉터리에 volume 파일 생성
 $ docker run -i -t --name myvolume_2 \
 -v myvolume:/root/ \
 ubuntu:14.04
+
 # 확인해보면 volume 파일 존재함
 $ cat /root/volume
+hello,volume!
 ```
 
 * 호스트에 저장함으로써 데이터를 보존하지만 파일이 실제로 어디에 저장되는 지 사용자는 알 필요 없음.
@@ -192,7 +202,17 @@ $ cat /root/volume
 
 ```shell
 $ docker inspect --type volume myvolume
-
+[
+    {
+        "CreatedAt": "2021-07-23T07:55:23Z",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/myvolume/_data",
+        "Name": "myvolume",
+        "Options": {},
+        "Scope": "local"
+    }
+]
 # 특정 구성 단위를 제어하는 명령어 사용...
 $ docker container inspect
 $ docker volume inspect
@@ -204,8 +224,10 @@ $ docker volume inspect
 
   ```shell
   $ ls /var/lib/docker/volumes/myvolume/_data
+  volume
   
   $ ls /var/lib/docker/volumes/myvolume/_data/volume
+  /var/lib/docker/volumes/myvolume/_data/volume
   ```
 
 * `docker volume create` 명령어를 사용하지 않아도 `-v` 옵션 입력할 때 이를 수행하도록 설정할 수 있다.
@@ -216,6 +238,9 @@ $ docker run -i -t --name volume_auto \
 ubuntu:14.04
 
 $ docker volume ls
+local     6bff12dd76e7a1bf25629e959054ef5f4d6fc374704f8d818b3efcef8f3561af
+local     c84c33b757bd0999555d1f1bd39df480032db5f9ed548f5609083f2e592d7ecd
+local     myvolume
 $ docker container inspect volume_auto
 # Source 항목에 정의된 디렉터리인 /var/lib/ ... 이 volume_auto 컨테이너에 마운트돼 볼륨으로 쓰고 있다.
 ```
