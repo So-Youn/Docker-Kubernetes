@@ -13,7 +13,27 @@ $ openssl genrsa -out ./certs/ca.key 2048
 $ openssl req -x509 -new -key ./cert/ca.key -days 10000 -out ./certs/ca.crt
 $ openssl genrsa -out ./cert/domain.key 2048
 
+$ openssl req -new -key ./certs/domain.key -subj /CN=${DOCKER_HOST_IP} -out ./certs/domain.csr
+$ openssl x509 -req -in ./certs/domain.csr -CA ./certs/ca.crt -CAkey ./certs/ca.key -CAcreateserial -out ./certs/domain.crt -days 10000 -extfile extfile.cnf
 ```
 
- 
+*  레지스트리에 로그인할 때 사용할 계정과 비밀번호를 저장하는 파일을 생성한다.
+
+```shell
+# htpasswd 설치
+# 우분투
+$ apt-get install apache2-utils
+
+# CentOS, 레드헷
+$ yum install httpd-tools
+```
+
+```shell
+$ htpasswd -c htpasswd soyun3963
+New password:
+
+$ mv htpasswd certs/
+```
+
+
 
