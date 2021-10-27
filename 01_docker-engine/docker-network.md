@@ -4,6 +4,34 @@
 * 스테이트풀(stateful) : 컨테이너가 데이터를 저장하고 있어 상태가 있음
   * 컨테이너 자체에서 데이터를 보관하므로 지양하는 설계
 
+
+
+## network create 
+
+* 도커 컨테이너끼리 이름으로 통신할 수 있는 가상 네트워크를 만들기
+
+```shell
+$ docker network create [OPTIONS] NETWORK
+
+soyun@yunsoyun-ui-MacBookPro docker % docker network create app-network
+b025b499ed736b2c77ce6255eca503ae70b7316f5544e5186c4937124254df44
+```
+
+* 기존에 생성된 컨테이너에 네트워크를 추가
+
+```shell
+# 워드프레스를 app-network에 속하게 하고 mysql을 이름으로 접근합니다.
+soyun@yunsoyun-ui-MacBookPro docker % docker network connect app-network mysql
+soyun@yunsoyun-ui-MacBookPro docker % docker run -d -p 8080:80 \
+  --network=app-network \
+  -e WORDPRESS_DB_HOST=mysql \
+  -e WORDPRESS_DB_NAME=wp \
+  -e WORDPRESS_DB_USER=wp \
+  -e WORDPRESS_DB_PASSWORD=wp \
+  wordpress
+
+```
+
 # 도커 네트워크
 
 ```markdown
