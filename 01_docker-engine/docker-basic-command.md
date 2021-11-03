@@ -98,5 +98,19 @@ Welcome to the MySQL monitor.  Commands end with ; or \g.
   1 row in set (0.00 sec)
   ```
 
+  * 중요한 데이터 관련 컨테이너 : `volume mount (-v)` 
+    * `-v /my/own/datadir:/var/lib/mysql`
+  
+  ```shell
+  docker run -d -p 3306:3306 \
+    -e MYSQL_ALLOW_EMPTY_PASSWORD=true \
+    --network=app-network \
+    --name mysql \
+    -v /my/own/datadir:/var/lib/mysql \
+    mysql:5.7
+  ```
+  
+  
+  
   
 
