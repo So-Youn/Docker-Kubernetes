@@ -114,3 +114,55 @@ Welcome to the MySQL monitor.  Commands end with ; or \g.
   
   
 
+## nginx 컨테이너 만들기
+
+> 1. nginx컨테이너를 50000 포트로 연결하여 실행
+> 2. 임의의 index.html 파일을 만들고 이 파일 내영을 제공하는 nginx 컨테이너 실행
+
+```shell
+soyun@yunsoyun-ui-MacBookPro docker % docker run -d --rm \
+> -p 50000:80 \
+> -v /Users/soyun/Desktop/Dev/docker/index.html:/usr/share/nginx/html/index.html \
+> nginx
+bce4fa47b17001a624a1f028d6ccf023f3677a366213caf0632a22c86f21c4e8
+```
+
+* 확인
+
+```shell
+soyun@yunsoyun-ui-MacBookPro docker % docker exec -it bce4fa47b170 bash
+root@bce4fa47b170:/# cd usr/share/nginx/html/
+root@bce4fa47b170:/usr/share/nginx/html# ls -al
+total 16
+drwxr-xr-x 2 root root 4096 Oct 12 04:37 .
+drwxr-xr-x 3 root root 4096 Oct 12 04:37 ..
+-rw-r--r-- 1 root root  497 Sep  7 15:21 50x.html
+-rw-r--r-- 1 root root   15 Nov  5 05:34 index.html
+root@bce4fa47b170:/usr/share/nginx/html# cat index.html 
+hello, world !
+```
+
+
+
+## php cli 컨테이너 실행하기
+
+```markdown
+> 브라우저 접속이 아닌 cli	테스트.
+
+hello.php를 php container로 실행
+```
+
+```shell
+soyun@yunsoyun-ui-MacBookPro docker % docker run --rm \
+> -v $(pwd)/hello.php:/app/hello.php \   
+> php:7 \
+> php /app/hello.php
+Unable to find image 'php:7' locally
+7: Pulling from library/php
+....
+```
+
+
+
+
+
